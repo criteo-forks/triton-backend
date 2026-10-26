@@ -466,7 +466,11 @@ BackendInputCollector::SetInputTensor(
   // types this may not be ideal but that should be a very rare
   // situation.
   if ((use_pinned_memory_type != TRITONSERVER_MEMORY_CPU_PINNED) &&
-      (input.memory_desc_.memory_type_ == use_pinned_memory_type)) {
+      ((input.memory_desc_.memory_type_ == use_pinned_memory_type) ||
+       ((request_count_ > 1) &&
+        (tensor_memory_type == TRITONSERVER_MEMORY_GPU) &&
+        (input.memory_desc_.memory_type_ ==
+         TRITONSERVER_MEMORY_CPU_PINNED)))) {
     if (pending_pinned_byte_size_ == 0) {
       pending_pinned_offset_ = tensor_buffer_offset;
     }
